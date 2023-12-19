@@ -1,7 +1,7 @@
 import * as React from "react";
 
-function MainComponent() {
-  const [selectedDishes, setSelectedDishes] = React.useState([]);
+export function MainComponent() {
+  const [selectedDishes, setSelectedDishes] = React.useState<string[]>([]);
   const [currentStep, setCurrentStep] = React.useState("choose");
   const dishes = [
     {
@@ -47,7 +47,7 @@ function MainComponent() {
     },
     { name: "Pineapple", price: 8000, description: "Sweet and juicy" },
   ];
-  function toggleDish(dishName) {
+  function toggleDish(dishName:string) {
     if (selectedDishes.includes(dishName)) {
       setSelectedDishes(selectedDishes.filter((dish) => dish !== dishName));
     } else {
@@ -56,7 +56,7 @@ function MainComponent() {
   }
   function calculateTotal() {
     return selectedDishes.reduce((total, dishName) => {
-      return total + dishes.find((dish) => dish.name === dishName).price;
+      return total + dishes.find((dish) => dish.name === dishName)!.price;
     }, 0);
   }
   function downloadReceipt() {
@@ -67,7 +67,7 @@ function MainComponent() {
         .map(
           (dishName) =>
             `- ${dishName}: ${
-              dishes.find((dish) => dish.name === dishName).price
+              dishes.find((dish) => dish.name === dishName)!.price
             } VND`
         )
         .join("\n") +
@@ -140,7 +140,7 @@ function MainComponent() {
               >
                 {dishName} -{" "}
                 {dishes
-                  .find((dish) => dish.name === dishName)
+                  .find((dish) => dish.name === dishName)!
                   .price.toLocaleString("en")}{" "}
                 VND
               </li>
