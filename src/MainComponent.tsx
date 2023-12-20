@@ -329,3 +329,5 @@ function MainComponent() {
     </div>
   );
 }
+
+export { MainComponent };
