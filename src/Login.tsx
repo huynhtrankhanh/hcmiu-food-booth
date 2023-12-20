@@ -6,7 +6,7 @@ function Login() {
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [errors, setErrors] = React.useState({ login: "", signup: "" });
   const [users, setUsers] = React.useState([]);
-  const [A, B] = React.useState([
+  const [[A, B], setCaptcha] = React.useState([
     Math.floor(Math.random() * 10),
     Math.floor(Math.random() * 10),
   ]);
@@ -27,8 +27,10 @@ function Login() {
           ...prevErrors,
           signup: "Captcha incorrect",
         }));
+        setCaptcha([Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)]);
         return;
       }
+      setCaptcha([Math.floor(Math.random() * 10), Math.floor(Math.random() * 10)]);
       setUsers([...users, newUser]);
       setIsSignUp(false);
       setErrors({ login: "", signup: "" });
@@ -102,7 +104,7 @@ function Login() {
                 htmlFor="captcha"
                 className="block text-sm font-roboto mb-2"
               >
-                Captcha: {A} + {B} = ?
+                Captcha: {A + " + " + B} = ?
               </label>
               <input
                 type="number"
