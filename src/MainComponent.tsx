@@ -3,7 +3,7 @@ import * as React from "react";
 function MainComponent() {
   const [currentStage, setCurrentStage] = React.useState("chooseFood");
   const [selectedDishes, setSelectedDishes] = React.useState<{ [key: string]: {description: string, price: number, quantity: number } }>({});
-  const [totalAmount, setTotalAmount] = React.useState(0);
+  const [_totalAmount, setTotalAmount] = React.useState(0);
   const [adminPassword, setAdminPassword] = React.useState("");
   const [adminInterface, setAdminInterface] = React.useState(false);
   const [orders, setOrders] = React.useState<{id: number, dishes:{ [key: string]: {description: string, price: number, quantity: number } },totalAmount:number,fulfilled:boolean}[]>([]);
