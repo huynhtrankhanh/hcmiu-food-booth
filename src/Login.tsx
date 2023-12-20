@@ -17,7 +17,7 @@ function Login() {
     Math.floor(Math.random() * 10),
     Math.floor(Math.random() * 10),
   ]);
-  const handleSubmit = (e) => {
+  const handleSubmit = (e: any) => {
     e.preventDefault();
     const form = e.target;
     const usernameOrEmail = form.usernameOrEmail?.value;
@@ -43,7 +43,7 @@ function Login() {
       setErrors({ login: "", signup: "" });
     } else {
       const userExists = users.find(
-        (user) =>
+        (user: {username:string,email:string,password:string}) =>
           (user.username === usernameOrEmail ||
             user.email === usernameOrEmail) &&
           user.password === password

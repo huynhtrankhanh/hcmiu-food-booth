@@ -2,12 +2,12 @@ import * as React from "react";
 
 function MainComponent() {
   const [currentStage, setCurrentStage] = React.useState("chooseFood");
-  const [selectedDishes, setSelectedDishes] = React.useState({});
+  const [selectedDishes, setSelectedDishes] = React.useState<{ [key: string]: {description: string, price: number, quantity: number } }>({});
   const [totalAmount, setTotalAmount] = React.useState(0);
   const [adminPassword, setAdminPassword] = React.useState("");
   const [adminInterface, setAdminInterface] = React.useState(false);
-  const [orders, setOrders] = React.useState([]);
-  const dishes = {
+  const [orders, setOrders] = React.useState<{id: number, dishes:{ [key: string]: {description: string, price: number, quantity: number } },totalAmount:number,fulfilled:boolean}[]>([]);
+  const dishes: {[key: string]: {description: string, price: number}} = {
     Pho: {
       description:
         "Pho is a harmonious harmony combination of many traditional and healthy ingredients",
@@ -23,7 +23,7 @@ function MainComponent() {
         "The main ingredients of noodles are noodles, the main broth is minced meat and pork intestines cooked together.",
       price: 35000,
     },
-    Apple: { price: 7000 },
+    Apple: { description:"",price: 7000 },
     SoftDrinks: {
       description: "Coca-cola / Pepsi / Sprite / Fanta / Sting / 7-up",
       price: 10000,
@@ -42,9 +42,9 @@ function MainComponent() {
       description: "Braised fish is a familiar dish of Western Vietnam people",
       price: 30000,
     },
-    Pineapple: { price: 8000 },
+    Pineapple: {description:"", price: 8000 },
   };
-  const handleDishSelect = (dishName) => {
+  const handleDishSelect = (dishName: string) => {
     setSelectedDishes((prevSelectedDishes) => {
       const currentQuantity = prevSelectedDishes[dishName]?.quantity || 0;
       return {
@@ -53,14 +53,14 @@ function MainComponent() {
       };
     });
   };
-  const handleDishRemoval = (dishName) => {
+  const handleDishRemoval = (dishName:string) => {
     setSelectedDishes((prevSelectedDishes) => {
       const updatedDishes = { ...prevSelectedDishes };
       delete updatedDishes[dishName];
       return updatedDishes;
     });
   };
-  const handleQuantityChange = (dishName, newQuantity) => {
+  const handleQuantityChange = (dishName:string, newQuantity:number) => {
     setSelectedDishes((prevSelectedDishes) => ({
       ...prevSelectedDishes,
       [dishName]: { ...prevSelectedDishes[dishName], quantity: newQuantity },
@@ -82,6 +82,7 @@ function MainComponent() {
       id: nextOrderId,
       dishes: selectedDishes,
       totalAmount: calculateTotal(),
+      fulfilled:false
     };
     setOrders([...orders, newOrder]);
     setCurrentStage("payment");
@@ -106,14 +107,14 @@ function MainComponent() {
     link.click();
     window.URL.revokeObjectURL(receiptUrl);
   };
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = (e:any) => {
     e.preventDefault();
     if (adminPassword === "admin") {
       setAdminInterface(true);
       setCurrentStage("");
     }
   };
-  const handleFulfillOrder = (orderId) => {
+  const handleFulfillOrder = (orderId:number) => {
     setOrders(
       orders.map((order) => {
         if (order.id === orderId) return { ...order, fulfilled: true };
@@ -131,7 +132,7 @@ function MainComponent() {
     setTotalAmount(0);
     setCurrentStage("chooseFood");
   };
-  const renderDish = (dishName, dish) => {
+  const renderDish = (dishName:string, dish:{description: string, price: number }) => {
     const isSelected = selectedDishes[dishName];
     const dishQuantity = isSelected ? selectedDishes[dishName].quantity : 0;
     return (
@@ -319,7 +320,7 @@ function MainComponent() {
         {adminInterface && renderAdminInterface()}
         {currentStage === "admin" && !adminInterface && renderAdminLogin()}
       </div>
-      <style jsx global>{`
+      <style>{`
         .border-solid {
           border-style: solid;
         }
