@@ -10,12 +10,9 @@ function Login() {
     return JSON.parse(localStorage.users);
   })());
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      localStorage.users = JSON.stringify(users);
-    }, 200);
-    return () => clearInterval(interval);
-  }, []);
+  React.useEffect(() => {
+    localStorage.users = JSON.stringify(users);
+  }, [users]);
   const [[A, B], setCaptcha] = React.useState([
     Math.floor(Math.random() * 10),
     Math.floor(Math.random() * 10),
