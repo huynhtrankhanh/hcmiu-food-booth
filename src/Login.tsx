@@ -5,7 +5,17 @@ function Login() {
   const [isSignUp, setIsSignUp] = React.useState(false);
   const [isAuthenticated, setIsAuthenticated] = React.useState(false);
   const [errors, setErrors] = React.useState({ login: "", signup: "" });
-  const [users, setUsers] = React.useState([]);
+  const [users, setUsers] = React.useState((() => {
+    if (localStorage.users === "" || localStorage.users === undefined) return [];
+    return JSON.parse(localStorage.users);
+  })());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      localStorage.users = JSON.stringify(users);
+    }, 200);
+    return () => clearInterval(interval);
+  }, []);
   const [[A, B], setCaptcha] = React.useState([
     Math.floor(Math.random() * 10),
     Math.floor(Math.random() * 10),
