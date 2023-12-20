@@ -141,6 +141,7 @@ function MainComponent() {
           isSelected ? "border-4 border-red-500" : "border-2 border-gray-300"
         }`}
       >
+        <img src={"/dishes/" + dishName.replace(/([A-Z])/g, "-$1").trim().toLowerCase().substring(1) + ".jpg"} />
         <p className="text-[#121212] text-lg mb-2">
           {dishName.replace(/([A-Z])/g, " $1").trim()}
         </p>
