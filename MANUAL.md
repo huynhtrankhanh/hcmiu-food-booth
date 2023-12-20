@@ -27,38 +27,56 @@ Before using the application, you will need to install Node.js and npm (Node Pac
 
 After you've successfully started the application, you can access it by opening your preferred web browser and navigating to the address provided in the terminal output (usually http://localhost:3000).
 
-**Step 1: Choose Dishes**
+## User Interface
 
-   - You will be greeted with a selection of dishes from the Cơm Việt menu.
-   - Browse through the available dishes, where each dish comes with a description and price.
-   - To select a dish that you'd like to order, click on the "Choose" button below that dish. The dish will be highlighted to indicate that it has been selected.
-   - You can select as many dishes as you wish during this step.
+### Login and Sign Up
 
-**Step 2: Review Shopping Cart**
+Upon arrival at the application, you are greeted with a straightforward form:
 
-   - Click on "Review Shopping Cart" when you are done with your selection.
-   - This will take you to a page that lists all the dishes you have chosen.
-   - Here you can review your orders and see the individual prices and the total cost.
+- If you **already have an account**, input your username or email and password in the designated fields and submit the form to log in.
+- If you are a **new user**, click the "Don't have an account? Sign Up!" button to toggle the form to sign up mode. Enter your desired username or email, a password, and solve a simple arithmetic captcha to create your new account.
 
-**Step 3: Proceed to Payment**
+### Main Interface
 
-   - Click the "Proceed to Payment" button to continue.
-   - Although the application simulates a cash payment, in this step, you will only be required to fill in a form.
+After a successful login, you will be directed to the main interface where you can begin the process of dish selection.
 
-**Step 4: Download Receipt**
+#### Dish Selection
 
-   - Provide your full name in the designated input field.
-   - You can add a note in the "Note" input field if you have any specific instructions or messages.
-   - Once you submit the form, a receipt will be generated and downloaded to your device.
-   - The receipt will include a detailed list of the dishes you selected and the total price.
+- Browse the grid of appetizing dishes, each accompanied by a thumbnail image, a description, and the price.
+- To add a dish to your shopping cart, select the "Add" button next to the relevant dish. You can adjust the quantity by clicking the "+" or "-" buttons or remove it entirely with the "Remove" button.
 
-## Navigating the Application
+#### Checkout
 
-- At any step, you can navigate back to the previous step using the "Back" or "Back to Menu" button.
-- The navigation steps are simple and designed for ease of use. You are guided seamlessly from choosing your dishes to downloading your receipt.
+- When you're ready to review your selections, press the "Checkout" button located at the bottom of the dish selection area.
+- The "Review Shopping Cart" page summarizes your selections and provides the total amount due.
+- Proceed to the payment stage by clicking "Pay with Cash." This confirms that you've made a cash payment equivalent to the total amount.
 
-## Support
+#### Payment and Receipt
 
-- If you encounter any issues or require assistance, please reach out to the support team provided by the application distributors.
+- Upon confirming the payment, you're directed to the payment confirmation page. Here, you can download a digital receipt by pressing the "Download Receipt" button.
+- To return to the dish selection stage and reset your order, click the "Return to Dish Selection" button.
 
-Enjoy your virtual meal experience with Cơm Việt - HCMIU Food Booth Application!
+### Administrative Interface
+
+#### Accessing Admin Interface
+
+- To enter the administrative interface, select "Jump to Admin Interface" from the main interface.
+- Enter the admin password ("admin") to gain access to the administrative features.
+  
+#### Managing Orders
+
+- The administrative view displays all orders and their statuses—fulfilled or pending fulfillment.
+- You can mark orders as fulfilled by selecting the corresponding button.
+- Exiting the admin interface is accomplished by clicking the "Exit Admin Interface" button, returning you to the main user interface.
+
+## User Tips
+
+- Ensure consistent use of either a username or email while logging in to prevent any confusion.
+- Regularly check your cart to manage dish quantities and avoid accidental overordering.
+- When administering, mark orders assiduously, as this action updates the status and informs users of the progress promptly.
+
+## Troubleshooting
+
+- If you encounter issues logging in, confirm that you're using the correct credentials and captcha response.
+- Should you experience any browser-related problems, refresh the page or clear your cache.
+- For persistent difficulties or inquiries, kindly reach out to customer support.
