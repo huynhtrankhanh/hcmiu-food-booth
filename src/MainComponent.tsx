@@ -1,215 +1,331 @@
 import * as React from "react";
 
-export function MainComponent() {
-  const [selectedDishes, setSelectedDishes] = React.useState<string[]>([]);
-  const [currentStep, setCurrentStep] = React.useState("choose");
-  const dishes = [
-    {
-      name: "Pho",
-      price: 35000,
+function MainComponent() {
+  const [currentStage, setCurrentStage] = React.useState("chooseFood");
+  const [selectedDishes, setSelectedDishes] = React.useState({});
+  const [totalAmount, setTotalAmount] = React.useState(0);
+  const [adminPassword, setAdminPassword] = React.useState("");
+  const [adminInterface, setAdminInterface] = React.useState(false);
+  const [orders, setOrders] = React.useState([]);
+  const dishes = {
+    Pho: {
       description:
-        "Harmonious harmony combination of many traditional and healthy ingredients",
+        "Pho is a harmonious harmony combination of many traditional and healthy ingredients",
+      price: 35000,
     },
-    {
-      name: "Braised Meat Rice",
-      price: 30000,
+    BraisedMeatRice: {
       description:
         "Braised pork is a familiar dish on the Vietnamese dinner table. The dish carries with it many cultural beauties of the country and people",
+      price: 30000,
     },
-    {
-      name: "Nam Vang Noodles",
-      price: 35000,
+    NamVangNoodles: {
       description:
-        "The main ingredients of noodles are noodles, the main broth is with minced meat and pork intestines cooked together.",
-    },
-    { name: "Apple", price: 7000, description: "Freshly picked" },
-    {
-      name: "Soft Drinks",
-      price: 10000,
-      description: "Coca-cola, Pepsi, Sprite, Fanta, Sting, 7-up",
-    },
-    {
-      name: "Beef Rice Noodles",
+        "The main ingredients of noodles are noodles, the main broth is minced meat and pork intestines cooked together.",
       price: 35000,
+    },
+    Apple: { price: 7000 },
+    SoftDrinks: {
+      description: "Coca-cola / Pepsi / Sprite / Fanta / Sting / 7-up",
+      price: 10000,
+    },
+    BeefRiceNoodles: {
       description:
         "Beef rice noodle soup's main ingredients are vermicelli, beef shank, pork sausage, pork sausage, boiled blood and a characteristic red broth.",
+      price: 35000,
     },
-    {
-      name: "Com Tam",
-      price: 30000,
+    ComTam: {
       description:
         "A typical dish of the Southern Vietnam region, considered a traditional and popular dish",
-    },
-    {
-      name: "Braised Fish Rice",
       price: 30000,
-      description: "Braised fish is a familiar dish of Western Vietnam people",
     },
-    { name: "Pineapple", price: 8000, description: "Sweet and juicy" },
-  ];
-  function toggleDish(dishName:string) {
-    if (selectedDishes.includes(dishName)) {
-      setSelectedDishes(selectedDishes.filter((dish) => dish !== dishName));
-    } else {
-      setSelectedDishes([...selectedDishes, dishName]);
-    }
-  }
-  function calculateTotal() {
-    return selectedDishes.reduce((total, dishName) => {
-      return total + dishes.find((dish) => dish.name === dishName)!.price;
-    }, 0);
-  }
-  function downloadReceipt() {
-    const total = calculateTotal();
-    const receiptText =
-      `Receipt for Cơm Việt:\n\n` +
-      selectedDishes
+    BraisedFishRice: {
+      description: "Braised fish is a familiar dish of Western Vietnam people",
+      price: 30000,
+    },
+    Pineapple: { price: 8000 },
+  };
+  const handleDishSelect = (dishName) => {
+    setSelectedDishes((prevSelectedDishes) => {
+      const currentQuantity = prevSelectedDishes[dishName]?.quantity || 0;
+      return {
+        ...prevSelectedDishes,
+        [dishName]: { quantity: currentQuantity + 1, ...dishes[dishName] },
+      };
+    });
+  };
+  const handleDishRemoval = (dishName) => {
+    setSelectedDishes((prevSelectedDishes) => {
+      const updatedDishes = { ...prevSelectedDishes };
+      delete updatedDishes[dishName];
+      return updatedDishes;
+    });
+  };
+  const handleQuantityChange = (dishName, newQuantity) => {
+    setSelectedDishes((prevSelectedDishes) => ({
+      ...prevSelectedDishes,
+      [dishName]: { ...prevSelectedDishes[dishName], quantity: newQuantity },
+    }));
+  };
+  const calculateTotal = () => {
+    return Object.values(selectedDishes).reduce(
+      (acc, { price, quantity }) => acc + price * quantity,
+      0
+    );
+  };
+  const handleCheckout = () => {
+    setTotalAmount(calculateTotal());
+    setCurrentStage("reviewCart");
+  };
+  const handlePayment = () => {
+    const nextOrderId = Math.max(0, ...orders.map((order) => order.id)) + 1;
+    const newOrder = {
+      id: nextOrderId,
+      dishes: selectedDishes,
+      totalAmount: calculateTotal(),
+    };
+    setOrders([...orders, newOrder]);
+    setCurrentStage("payment");
+  };
+  const handleDownloadReceipt = () => {
+    const receiptContent =
+      `Receipt\n----------\n` +
+      Object.entries(selectedDishes)
         .map(
-          (dishName) =>
-            `- ${dishName}: ${
-              dishes.find((dish) => dish.name === dishName)!.price
-            } VND`
+          ([name, { price, quantity }]) =>
+            `${name}: ${price.toLocaleString("vi-VN")} VND x ${quantity}`
         )
         .join("\n") +
-      `\n\nTotal: ${total} VND`;
-    const element = document.createElement("a");
-    const file = new Blob([receiptText], { type: "text/plain" });
-    element.href = URL.createObjectURL(file);
-    element.download = "ComViet_Receipt.txt";
-    document.body.appendChild(element);
-    element.click();
-  }
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4 bg-[#FAF3E0]">
-      {currentStep === "choose" && (
-        <>
-          <h1 className="text-4xl font-bold text-[#6D4C41] mb-8 font-crimson-text">
-            Cơm Việt - HCMIU Food Booth
-          </h1>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {dishes.map((dish, index) => (
-              <div
-                key={index}
-                className={`flex flex-col items-center ${
-                  selectedDishes.includes(dish.name)
-                    ? "ring-4 ring-[#6D4C41] ring-opacity-50"
-                    : "bg-white"
-                } shadow-xl p-6 rounded-lg`}
-              >
-                <img
-                  src={`/dishes/${dish.name
-                    .toLowerCase()
-                    .replace(/ /g, "-")}.jpg`}
-                  alt={`${dish.name} at Cơm Việt`}
-                  className="w-64 h-64 object-cover rounded-md mb-4"
-                />
-                <h2 className="text-2xl font-semibold mb-2 text-[#6D4C41] font-roboto">
-                  {dish.name}
-                </h2>
-                <p className="text-md mb-1 font-roboto">{dish.description}</p>
-                <p className="text-md font-roboto">
-                  {dish.price.toLocaleString("en")} VND
-                </p>
+      `\n----------\nTotal: ${calculateTotal().toLocaleString("vi-VN")} VND`;
+    const blob = new Blob([receiptContent], {
+      type: "text/plain;charset=utf-8",
+    });
+    const receiptUrl = window.URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = receiptUrl;
+    link.download = "receipt.txt";
+    link.click();
+    window.URL.revokeObjectURL(receiptUrl);
+  };
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (adminPassword === "admin") {
+      setAdminInterface(true);
+      setCurrentStage("");
+    }
+  };
+  const handleFulfillOrder = (orderId) => {
+    setOrders(
+      orders.map((order) => {
+        if (order.id === orderId) return { ...order, fulfilled: true };
+        return order;
+      })
+    );
+  };
+  const handleAdminExit = () => {
+    setAdminInterface(false);
+    setAdminPassword("");
+    setCurrentStage("chooseFood");
+  };
+  const handleResetOrder = () => {
+    setSelectedDishes({});
+    setTotalAmount(0);
+    setCurrentStage("chooseFood");
+  };
+  const renderDish = (dishName, dish) => {
+    const isSelected = selectedDishes[dishName];
+    const dishQuantity = isSelected ? selectedDishes[dishName].quantity : 0;
+    return (
+      <div
+        key={dishName}
+        className={`p-4 m-2 ${
+          isSelected ? "border-4 border-red-500" : "border-2 border-gray-300"
+        }`}
+      >
+        <p className="text-[#121212] text-lg mb-2">
+          {dishName.replace(/([A-Z])/g, " $1").trim()}
+        </p>
+        {dish.description && <p className="text-sm mb-2">{dish.description}</p>}
+        <p className="text-sm mb-2">
+          Price: {dish.price.toLocaleString("vi-VN")} VND
+        </p>
+        <div className="flex justify-between items-center">
+          <button
+            onClick={() => handleDishSelect(dishName)}
+            className="bg-green-500 text-white p-1.5 text-xs mb-2"
+          >
+            Add
+          </button>
+          {isSelected && (
+            <>
+              <div className="flex items-center">
                 <button
-                  onClick={() => toggleDish(dish.name)}
-                  className="bg-[#6D4C41] text-white font-bold py-2 px-4 rounded-lg mt-4 hover:bg-[#5e4233] transition duration-200 font-roboto"
+                  onClick={() =>
+                    handleQuantityChange(dishName, dishQuantity - 1)
+                  }
+                  disabled={dishQuantity <= 1}
+                  className="bg-red-400 text-white p-1.5 text-xs mr-4"
                 >
-                  Choose
+                  -
+                </button>
+                <span className="text-sm">{dishQuantity}</span>
+                <button
+                  onClick={() =>
+                    handleQuantityChange(dishName, dishQuantity + 1)
+                  }
+                  className="bg-green-400 text-white p-1.5 text-xs ml-4"
+                >
+                  +
                 </button>
               </div>
-            ))}
-          </div>
-          <button
-            onClick={() => setCurrentStep("review")}
-            className="border-2 border-[#6D4C41] text-[#6D4C41] font-bold py-2 px-4 rounded-lg mb-4 hover:bg-[#6D4C41] hover:text-white transition duration-200 font-roboto"
-          >
-            Review Shopping Cart
-          </button>
-        </>
-      )}
-      {currentStep === "review" && (
-        <>
-          <h2 className="text-3xl font-bold text-[#6D4C41] mb-6 font-crimson-text">
-            Shopping Cart
-          </h2>
-          <ul className="mb-4">
-            {selectedDishes.map((dishName) => (
-              <li
-                key={dishName}
-                className="border-b-2 border-[#6D4C41] py-2 font-roboto"
+              <button
+                onClick={() => handleDishRemoval(dishName)}
+                className="bg-red-500 text-white p-1.5 text-xs"
               >
-                {dishName} -{" "}
-                {dishes
-                  .find((dish) => dish.name === dishName)!
-                  .price.toLocaleString("en")}{" "}
-                VND
-              </li>
-            ))}
-          </ul>
-          <p className="font-bold text-[#6D4C41] mb-6 font-roboto">
-            Total: {calculateTotal().toLocaleString("en")} VND
-          </p>
-          <button
-            onClick={() => setCurrentStep("pay")}
-            className="bg-[#6D4C41] text-white font-bold py-2 px-4 rounded-lg mb-4 hover:bg-[#5e4233] transition duration-200 font-roboto"
-          >
-            Proceed to Payment
-          </button>
-          <button
-            onClick={() => setCurrentStep("choose")}
-            className="border-2 border-[#6D4C41] text-[#6D4C41] font-bold py-2 px-4 rounded-lg hover:bg-[#6D4C41] hover:text-white transition duration-200 font-roboto"
-          >
-            Back to Menu
-          </button>
-        </>
-      )}
-      {currentStep === "pay" && (
-        <div className="w-full max-w-sm bg-white shadow-xl p-8 rounded-lg">
-          <h2 className="text-3xl font-bold text-[#6D4C41] mb-6 font-crimson-text">
-            Cash Payment at Cơm Việt
-          </h2>
-          <form
-            onSubmit={(event) => {
-              event.preventDefault();
-              downloadReceipt();
-            }}
-            className="flex flex-col space-y-4"
-          >
-            <input
-              type="text"
-              name="fullName"
-              placeholder="Full Name"
-              className="border-2 border-[#6D4C41] rounded-lg p-2 font-roboto"
-              required
-            />
-            <input
-              type="number"
-              name="amount"
-              value={calculateTotal()}
-              disabled
-              className="border-2 border-[#6D4C41] rounded-lg p-2 font-roboto"
-            />
-            <input
-              type="text"
-              name="note"
-              placeholder="Note (optional)"
-              className="border-2 border-[#6D4C41] rounded-lg p-2 font-roboto"
-            />
-            <button
-              type="submit"
-              className="bg-[#6D4C41] text-white font-bold py-2 rounded-lg hover:bg-[#5e4233] transition duration-200 font-roboto"
-            >
-              Download Receipt
-            </button>
-          </form>
-          <button
-            onClick={() => setCurrentStep("choose")}
-            className="border-2 border-[#6D4C41] text-[#6D4C41] font-bold py-2 px-4 rounded-lg mt-4 hover:bg-[#6D4C41] hover:text-white transition duration-200 font-roboto"
-          >
-            Back to Menu
-          </button>
+                Remove
+              </button>
+            </>
+          )}
         </div>
+      </div>
+    );
+  };
+  const renderFoodSelection = () => (
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Object.entries(dishes).map(([dishName, dish]) =>
+        renderDish(dishName, dish)
       )}
+      {Object.keys(selectedDishes).length > 0 && (
+        <button
+          onClick={handleCheckout}
+          className="bg-blue-500 text-white p-2 mt-4 col-span-1 sm:col-span-2 lg:col-span-3"
+        >
+          Checkout
+        </button>
+      )}
+    </div>
+  );
+  const renderShoppingCart = () => (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">Review Shopping Cart</h2>
+      {Object.entries(selectedDishes).map(([name, { price, quantity }]) => (
+        <div key={name} className="p-4 m-2 border-4 border-red-500 font-bold">
+          <h3 className="text-[#121212]">
+            {name.replace(/([A-Z])/g, " $1").trim()}
+          </h3>
+          <p className="text-sm">
+            Price: {price.toLocaleString("vi-VN")} VND x {quantity}
+          </p>
+        </div>
+      ))}
+      <div className="text-lg mb-4">
+        Total: {calculateTotal().toLocaleString("vi-VN")} VND
+      </div>
+      <button onClick={handlePayment} className="bg-green-500 text-white p-2">
+        Pay with Cash
+      </button>
+    </div>
+  );
+  const renderPayment = () => (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">Payment</h2>
+      <p className="mb-4">
+        Cash payment received. Total paid:{" "}
+        {calculateTotal().toLocaleString("vi-VN")} VND
+      </p>
+      <button
+        onClick={handleDownloadReceipt}
+        className="bg-yellow-500 text-[#121212] p-2"
+      >
+        Download Receipt
+      </button>
+      <button
+        onClick={handleResetOrder}
+        className="bg-red-500 text-white p-2 mt-4"
+      >
+        Return to Dish Selection
+      </button>
+    </div>
+  );
+  const renderAdminInterface = () => (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">Admin Interface</h2>
+      {orders.map((order) => (
+        <div
+          key={order.id}
+          className={`p-4 my-2 ${
+            order.fulfilled
+              ? "border-4 border-green-500"
+              : "border-4 border-yellow-500"
+          }`}
+        >
+          <h3 className="font-bold text-[#121212] mb-2">{`Order #${order.id}`}</h3>
+          {Object.entries(order.dishes).map(([name, { price, quantity }]) => (
+            <p key={name} className="text-sm">{`- ${name
+              .replace(/([A-Z])/g, " $1")
+              .trim()}: ${price.toLocaleString("vi-VN")} VND x ${quantity}`}</p>
+          ))}
+          <div className="text-right mb-2">
+            <strong>Total:</strong> {order.totalAmount.toLocaleString("vi-VN")}{" "}
+            VND
+          </div>
+          {!order.fulfilled && (
+            <button
+              onClick={() => handleFulfillOrder(order.id)}
+              className="bg-green-500 text-white p-1.5"
+            >
+              Mark as Fulfilled
+            </button>
+          )}
+        </div>
+      ))}
+      <button
+        onClick={handleAdminExit}
+        className="bg-red-500 text-white p-2 mt-4"
+      >
+        Exit Admin Interface
+      </button>
+    </div>
+  );
+  const renderAdminLogin = () => (
+    <div>
+      <h2 className="text-2xl font-semibold mb-4">Enter Admin Password</h2>
+      <form onSubmit={handleAdminLogin}>
+        <input
+          type="password"
+          name="adminPassword"
+          value={adminPassword}
+          onChange={(e) => setAdminPassword(e.target.value)}
+          className="p-2 border-2 m-2"
+        />
+        <button type="submit" className="bg-blue-500 text-white p-2">
+          Login
+        </button>
+      </form>
+    </div>
+  );
+  return (
+    <div className="font-roboto p-4">
+      <button
+        onClick={() => setCurrentStage("admin")}
+        className="w-full bg-red-600 text-white p-4 font-bold"
+      >
+        Jump to Admin Interface
+      </button>
+      <div className="mt-4">
+        {currentStage === "chooseFood" && renderFoodSelection()}
+        {currentStage === "reviewCart" && renderShoppingCart()}
+        {currentStage === "payment" && renderPayment()}
+        {adminInterface && renderAdminInterface()}
+        {currentStage === "admin" && !adminInterface && renderAdminLogin()}
+      </div>
+      <style jsx global>{`
+        .border-solid {
+          border-style: solid;
+        }
+        .border-dashed {
+          border-style: dashed;
+        }
+      `}</style>
     </div>
   );
 }
