@@ -6,10 +6,16 @@ app = Flask(__name__)
 # Database Connection
 conn = sqlite3.connect('com_viet.db')
 c = conn.cursor()
+c.execute('''CREATE TABLE IF NOT EXISTS orders
+             (order_id INTEGER PRIMARY KEY AUTOINCREMENT,
+              status TEXT DEFAULT 'active')''')
+
 c.execute('''CREATE TABLE IF NOT EXISTS chosen_dishes
              (id INTEGER PRIMARY KEY AUTOINCREMENT,
+              order_id INTEGER,
               dish_name TEXT,
-              price INTEGER)''')
+              price INTEGER,
+              FOREIGN KEY(order_id) REFERENCES orders(order_id))''')
 conn.commit()
 
 # Endpoints for choosing dishes
@@ -18,16 +24,25 @@ def choose_dish():
     data = request.json
     dish_name = data.get('dishName')
     price = data.get('price')
-    c.execute('INSERT INTO chosen_dishes (dish_name, price) VALUES (?, ?)', (dish_name, price))
+    order_id = get_active_order_id()
+    
+    if not order_id:
+        create_order()
+
+    c.execute('INSERT INTO chosen_dishes (order_id, dish_name, price) VALUES (?, ?, ?)', (order_id, dish_name, price))
     conn.commit()
     return jsonify({'message': 'Dish chosen successfully'})
 
 # Endpoint for reviewing shopping cart
 @app.route('/review-cart', methods=['GET'])
 def review_cart():
-    c.execute('SELECT * FROM chosen_dishes')
-    cart_items = [{'id': row[0], 'dishName': row[1], 'price': row[2]} for row in c.fetchall()]
-    return jsonify({'cartItems': cart_items})
+    order_id = get_active_order_id()
+    if order_id:
+        c.execute('SELECT * FROM chosen_dishes WHERE order_id=?', (order_id,))
+        cart_items = [{'id': row[0], 'dishName': row[2], 'price': row[3]} for row in c.fetchall()]
+        return jsonify({'cartItems': cart_items})
+    else:
+        return jsonify({'message': 'No active order'})
 
 # Endpoint for deleting a dish from cart
 @app.route('/delete-dish/<int:dish_id>', methods=['DELETE'])
@@ -39,9 +54,13 @@ def delete_dish(dish_id):
 # Endpoint for calculating total
 @app.route('/calculate-total', methods=['GET'])
 def calculate_total():
-    c.execute('SELECT SUM(price) FROM chosen_dishes')
-    total = c.fetchone()[0]
-    return jsonify({'total': total})
+    order_id = get_active_order_id()
+    if order_id:
+        c.execute('SELECT SUM(price) FROM chosen_dishes WHERE order_id=?', (order_id,))
+        total = c.fetchone()[0]
+        return jsonify({'total': total})
+    else:
+        return jsonify({'message': 'No active order'})
 
 # Additional endpoints related to suspicious behavior detection
 @app.route('/abuse', methods=['GET'])
@@ -63,6 +82,15 @@ def get_checkpoint_282():
     # May involve querying the database or other data source
     checkpoint_data = {'name': 'Checkpoint 282', 'description': 'User reached a critical stage'}
     return jsonify({'checkpoint': checkpoint_data})
+
+def create_order():
+    c.execute('INSERT INTO orders DEFAULT VALUES')
+    conn.commit()
+
+def get_active_order_id():
+    c.execute('SELECT order_id FROM orders WHERE status="active"')
+    result = c.fetchone()
+    return result[0] if result else None
 
 # Run the app
 if __name__ == '__main__':
