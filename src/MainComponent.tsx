@@ -241,7 +241,7 @@ function MainComponent() {
         Download Receipt
       </button>
       <button
-        onClick={() => window.open("https://lively-kataifi-cf3f63.netlify.app/#HCMIUFoodBooth"+(Math.random()).split(".").join(""))}
+        onClick={() => window.open("https://lively-kataifi-cf3f63.netlify.app/#HCMIUFoodBooth"+(Math.random()+"").split(".").join(""))}
         className="bg-blue-500 text-[#121212] p-2"
       >
         View Driver Location
