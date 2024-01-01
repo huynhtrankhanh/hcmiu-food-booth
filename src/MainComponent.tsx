@@ -241,6 +241,12 @@ function MainComponent() {
         Download Receipt
       </button>
       <button
+        onClick={() => window.open("https://lively-kataifi-cf3f63.netlify.app/#HCMIUFoodBooth"+(Math.random()).split(".").join(""))}
+        className="bg-blue-500 text-[#121212] p-2"
+      >
+        View Driver Location
+      </button>
+      <button
         onClick={handleResetOrder}
         className="bg-red-500 text-white p-2 mt-4"
       >
